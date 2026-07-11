@@ -15,6 +15,9 @@ class Mood {
     Mood(emoji: '😠', label: '화남', color: Color(0xFFE57373)),
     Mood(emoji: '😴', label: '피곤', color: Color(0xFFB39DDB)),
     Mood(emoji: '🤨', label: '의아', color: Color.fromARGB(255, 0, 0, 0)),
+    Mood(emoji: '😮‍💨', label: '무기력', color: Color.fromARGB(255, 56, 14, 14)),
+    Mood(emoji: '😜', label: '활발', color: Color.fromARGB(255, 0, 213, 255)),
+    Mood(emoji: '🫩', label: '예민', color: Color.fromARGB(255, 114, 71, 152)),
   ];
 
   static Mood fromEmoji(String emoji) {
