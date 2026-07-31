@@ -17,10 +17,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const CupertinoApp(
-      title: '오늘의 기분',
+      title: '오늘의 기분은?',
       debugShowCheckedModeBanner: false,
       theme: CupertinoThemeData(
-        primaryColor: CupertinoColors.systemIndigo,
+        primaryColor: Color.fromARGB(255, 192, 80, 80),
       ),
       home: HomeScreen(),
     );

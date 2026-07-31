@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: CustomScrollView(
         slivers: [
           CupertinoSliverNavigationBar(
-            largeTitle: const Text('오늘의 기분'),
+            largeTitle: const Text('오늘의 기분은?'),
             leading: CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: () => Navigator.push(
@@ -131,7 +131,7 @@ class _EmptyState extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           CupertinoButton.filled(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(26),
             onPressed: onAdd,
             child: const Text('기분 기록하기'),
           ),

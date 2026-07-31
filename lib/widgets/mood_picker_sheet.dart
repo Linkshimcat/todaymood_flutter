@@ -95,7 +95,7 @@ class _MoodPickerSheetState extends State<MoodPickerSheet> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '오늘 기분이 어떠세요?',
+                  '오늘 기분이 어떠세요? (*복수 체크 가능)',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -104,8 +104,8 @@ class _MoodPickerSheetState extends State<MoodPickerSheet> {
                 ),
                 const SizedBox(height: 16),
                 Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
+                  spacing: 20,
+                  runSpacing: 10,
                   children: Mood.all.map((mood) {
                     final isSelected = mood.emoji == _selected?.emoji;
                     return GestureDetector(
@@ -160,7 +160,7 @@ class _MoodPickerSheetState extends State<MoodPickerSheet> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: CupertinoColors.tertiarySystemFill.resolveFrom(context),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(18),
             ),
           ),
           const SizedBox(height: 16),
