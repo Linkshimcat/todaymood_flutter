@@ -1,10 +1,14 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 
 import '../models/mood_entry.dart';
+import '../services/live_activity_service.dart';
+import '../services/mood_editor.dart';
 import '../services/mood_storage.dart';
+import '../services/photo_storage.dart';
+import '../services/widget_service.dart';
+import '../theme.dart';
 import '../widgets/mood_card.dart';
-import '../widgets/mood_picker_sheet.dart';
-import 'reminder_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,26 +37,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _addMood() async {
-    final result = await showCupertinoModalPopup<MoodPickerResult>(
-      context: context,
-      builder: (_) => const MoodPickerSheet(),
-    );
-    if (result == null) return;
+    if (await createMoodEntry(context)) await _load();
+  }
 
-    final entry = MoodEntry(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
-      date: DateTime.now(),
-      emoji: result.mood.emoji,
-      note: result.note,
-    );
-
-    setState(() => _entries.insert(0, entry));
-    await _storage.save(_entries);
+  Future<void> _editMood(MoodEntry entry) async {
+    if (await editMoodEntry(context, entry)) await _load();
   }
 
   Future<void> _deleteMood(MoodEntry entry) async {
+    HapticFeedback.mediumImpact();
     setState(() => _entries.removeWhere((e) => e.id == entry.id));
     await _storage.save(_entries);
+    if (entry.imageFileName != null) {
+      await PhotoStorage.delete(entry.imageFileName!);
+    }
+    await LiveActivityService.refresh();
+    await WidgetService.refresh();
   }
 
   @override
@@ -61,23 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: CupertinoColors.systemGroupedBackground,
       child: CustomScrollView(
         slivers: [
-          CupertinoSliverNavigationBar(
-            largeTitle: const Text('오늘의 기분은?'),
-            leading: CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: () => Navigator.push(
-                context,
-                CupertinoPageRoute<void>(
-                  builder: (_) => const ReminderScreen(),
-                ),
-              ),
-              child: const Icon(CupertinoIcons.bell, size: 24),
-            ),
-            trailing: CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: _addMood,
-              child: const Icon(CupertinoIcons.add_circled_solid, size: 28),
-            ),
+          const CupertinoSliverNavigationBar(
+            backgroundColor: kNavBarBackground,
+            largeTitle: Text('오늘의 기분은?'),
           ),
           if (_loading)
             const SliverFillRemaining(
@@ -91,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           else
             SliverPadding(
-              padding: const EdgeInsets.only(top: 10, bottom: 40),
+              padding: const EdgeInsets.only(top: 10, bottom: kBottomNavSpace),
               sliver: SliverList.builder(
                 itemCount: _entries.length,
                 itemBuilder: (context, index) {
@@ -99,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return MoodCard(
                     entry: entry,
                     onDelete: () => _deleteMood(entry),
+                    onTap: () => _editMood(entry),
                   );
                 },
               ),

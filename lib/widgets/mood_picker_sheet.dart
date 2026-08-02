@@ -1,26 +1,56 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../models/mood.dart';
+import '../models/mood_entry.dart';
+import '../services/photo_storage.dart';
 
 class MoodPickerResult {
-  final Mood mood;
+  final List<Mood> moods;
   final String note;
+  final String? imagePath;
 
-  const MoodPickerResult({required this.mood, required this.note});
+  const MoodPickerResult({
+    required this.moods,
+    required this.note,
+    this.imagePath,
+  });
 }
 
 class MoodPickerSheet extends StatefulWidget {
-  const MoodPickerSheet({super.key});
+  /// 수정할 기록. null이면 새 기록을 작성하는 것이다.
+  final MoodEntry? initial;
+
+  const MoodPickerSheet({super.key, this.initial});
 
   @override
   State<MoodPickerSheet> createState() => _MoodPickerSheetState();
 }
 
 class _MoodPickerSheetState extends State<MoodPickerSheet> {
-  Mood? _selected;
+  final _selected = <String>{};
   final _noteController = TextEditingController();
+  String? _imagePath;
   double _dragOffset = 0;
   bool _dragging = false;
+
+  bool get _isEditing => widget.initial != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initial;
+    if (initial != null) {
+      _selected.addAll(initial.emojis);
+      _noteController.text = initial.note;
+      if (initial.imageFileName != null) {
+        _imagePath = PhotoStorage.pathFor(initial.imageFileName!);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -45,6 +75,46 @@ class _MoodPickerSheetState extends State<MoodPickerSheet> {
         _dragOffset = 0;
       });
     }
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    HapticFeedback.lightImpact();
+    final picked = await ImagePicker().pickImage(
+      source: source,
+      maxWidth: 1600,
+      imageQuality: 85,
+    );
+    if (picked != null) setState(() => _imagePath = picked.path);
+  }
+
+  void _showImageOptions() {
+    HapticFeedback.lightImpact();
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (sheetContext) => CupertinoActionSheet(
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(sheetContext);
+              _pickImage(ImageSource.camera);
+            },
+            child: const Text('사진 촬영'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(sheetContext);
+              _pickImage(ImageSource.gallery);
+            },
+            child: const Text('앨범에서 선택'),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDestructiveAction: true,
+          onPressed: () => Navigator.pop(sheetContext),
+          child: const Text('취소'),
+        ),
+      ),
+    );
   }
 
   @override
@@ -94,12 +164,26 @@ class _MoodPickerSheetState extends State<MoodPickerSheet> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  '오늘 기분이 어떠세요? (*복수 체크 가능)',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: CupertinoColors.label.resolveFrom(context),
+                Text.rich(
+                  TextSpan(
+                    text: _isEditing ? '기록 수정 ' : '오늘 기분이 어떠세요? ',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: CupertinoColors.label.resolveFrom(context),
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '(복수 선택 가능)',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
+                          color: CupertinoColors.secondaryLabel.resolveFrom(
+                            context,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -107,9 +191,18 @@ class _MoodPickerSheetState extends State<MoodPickerSheet> {
                   spacing: 20,
                   runSpacing: 10,
                   children: Mood.all.map((mood) {
-                    final isSelected = mood.emoji == _selected?.emoji;
+                    final isSelected = _selected.contains(mood.emoji);
                     return GestureDetector(
-                      onTap: () => setState(() => _selected = mood),
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        setState(() {
+                          if (isSelected) {
+                            _selected.remove(mood.emoji);
+                          } else {
+                            _selected.add(mood.emoji);
+                          }
+                        });
+                      },
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 150),
                         padding: const EdgeInsets.all(10),
@@ -163,21 +256,77 @@ class _MoodPickerSheetState extends State<MoodPickerSheet> {
               borderRadius: BorderRadius.circular(18),
             ),
           ),
+          const SizedBox(height: 12),
+          if (_imagePath == null)
+            CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: _showImageOptions,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(CupertinoIcons.camera, size: 20),
+                  SizedBox(width: 6),
+                  Text('사진 추가'),
+                ],
+              ),
+            )
+          else
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Image.file(
+                    File(_imagePath!),
+                    width: double.infinity,
+                    height: 140,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Positioned(
+                  top: 6,
+                  right: 6,
+                  child: GestureDetector(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      setState(() => _imagePath = null);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Color(0x99000000),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        CupertinoIcons.xmark,
+                        size: 16,
+                        color: CupertinoColors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
             child: CupertinoButton.filled(
               borderRadius: BorderRadius.circular(12),
-              onPressed: _selected == null
+              onPressed: _selected.isEmpty
                   ? null
-                  : () => Navigator.pop(
-                      context,
-                      MoodPickerResult(
-                        mood: _selected!,
-                        note: _noteController.text.trim(),
-                      ),
-                    ),
-              child: const Text('기록하기'),
+                  : () {
+                      HapticFeedback.mediumImpact();
+                      Navigator.pop(
+                        context,
+                        MoodPickerResult(
+                          moods: Mood.all
+                              .where((m) => _selected.contains(m.emoji))
+                              .toList(),
+                          note: _noteController.text.trim(),
+                          imagePath: _imagePath,
+                        ),
+                      );
+                    },
+              child: Text(_isEditing ? '수정 완료' : '기록하기'),
             ),
           ),
         ],

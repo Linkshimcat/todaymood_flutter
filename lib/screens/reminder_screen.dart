@@ -1,9 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/reminder_settings.dart';
+import '../services/live_activity_service.dart';
 import '../services/notification_service.dart';
+import '../theme.dart';
 
 class ReminderScreen extends StatefulWidget {
   const ReminderScreen({super.key});
@@ -17,11 +21,36 @@ class _ReminderScreenState extends State<ReminderScreen> {
 
   ReminderSettings? _settings;
   Timer? _timeDebounce;
+  bool _liveActivitySupported = false;
+  bool _liveActivityOn = false;
 
   @override
   void initState() {
     super.initState();
     ReminderSettings.load().then((s) => setState(() => _settings = s));
+    _loadLiveActivity();
+  }
+
+  Future<void> _loadLiveActivity() async {
+    final supported = await LiveActivityService.isSupported();
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _liveActivitySupported = supported;
+      _liveActivityOn = prefs.getBool('live_activity_enabled') ?? false;
+    });
+  }
+
+  Future<void> _toggleLiveActivity(bool value) async {
+    HapticFeedback.selectionClick();
+    setState(() => _liveActivityOn = value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('live_activity_enabled', value);
+    if (value) {
+      await LiveActivityService.start();
+    } else {
+      await LiveActivityService.end();
+    }
   }
 
   @override
@@ -58,6 +87,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
   }
 
   Future<void> _toggleEnabled(bool value) async {
+    HapticFeedback.selectionClick();
     if (value) {
       final granted = await NotificationService.instance.requestPermission();
       if (!granted) {
@@ -86,11 +116,16 @@ class _ReminderScreenState extends State<ReminderScreen> {
   Future<void> _toggleWeekday(int weekday) async {
     final days = Set<int>.from(_settings!.weekdays);
     if (days.contains(weekday)) {
-      if (days.length == 1) return; // 최소 한 요일은 유지
+      // 최소 한 요일은 유지 — 해제할 수 없다는 걸 진동으로 알린다.
+      if (days.length == 1) {
+        HapticFeedback.heavyImpact();
+        return;
+      }
       days.remove(weekday);
     } else {
       days.add(weekday);
     }
+    HapticFeedback.selectionClick();
     await _update(_settings!.copyWith(weekdays: days));
   }
 
@@ -100,14 +135,17 @@ class _ReminderScreenState extends State<ReminderScreen> {
     return CupertinoPageScaffold(
       backgroundColor: CupertinoColors.systemGroupedBackground,
       navigationBar: const CupertinoNavigationBar(
-        middle: Text('기록 알림'),
+        backgroundColor: kNavBarBackground,
+        middle: Text('설정'),
       ),
       child: settings == null
           ? const Center(child: CupertinoActivityIndicator())
           : SafeArea(
               child: ListView(
+                padding: const EdgeInsets.only(bottom: kBottomNavSpace),
                 children: [
                   CupertinoListSection.insetGrouped(
+                    header: const Text('알림'),
                     children: [
                       CupertinoListTile(
                         title: const Text('알림 받기'),
@@ -118,6 +156,22 @@ class _ReminderScreenState extends State<ReminderScreen> {
                       ),
                     ],
                   ),
+                  if (_liveActivitySupported)
+                    CupertinoListSection.insetGrouped(
+                      header: const Text('실시간 활동'),
+                      footer: const Text(
+                        '잠금화면과 다이나믹 아일랜드에 오늘 기분을 기록했는지 보여줍니다.',
+                      ),
+                      children: [
+                        CupertinoListTile(
+                          title: const Text('잠금화면에 표시'),
+                          trailing: CupertinoSwitch(
+                            value: _liveActivityOn,
+                            onChanged: _toggleLiveActivity,
+                          ),
+                        ),
+                      ],
+                    ),
                   if (settings.enabled) ...[
                     CupertinoListSection.insetGrouped(
                       header: const Text('요일'),

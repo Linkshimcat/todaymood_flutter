@@ -1,13 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-import 'screens/home_screen.dart';
+import 'screens/root_screen.dart';
 import 'services/notification_service.dart';
+import 'services/photo_storage.dart';
+import 'services/widget_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ko_KR');
+  await PhotoStorage.init();
   await NotificationService.instance.init();
+  // 앱을 껐다 켜는 사이 기록이 바뀌었을 수 있으니 위젯을 한 번 맞춰둔다.
+  await WidgetService.refresh();
   runApp(const MyApp());
 }
 
@@ -22,7 +27,7 @@ class MyApp extends StatelessWidget {
       theme: CupertinoThemeData(
         primaryColor: Color.fromARGB(255, 192, 80, 80),
       ),
-      home: HomeScreen(),
+      home: RootScreen(),
     );
   }
 }
