@@ -1,10 +1,9 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 import '../services/mood_editor.dart';
-import '../theme.dart';
+import '../widgets/glass_surface.dart';
+import '../widgets/liquid_indicator.dart';
 import 'calendar_screen.dart';
 import 'home_screen.dart';
 import 'reminder_screen.dart';
@@ -18,9 +17,6 @@ class RootScreen extends StatefulWidget {
 
 class _RootScreenState extends State<RootScreen> {
   static const _barHeight = 58.0;
-  static const _addButtonSize = 52.0;
-  // ⊕ 버튼은 바 정중앙에 놓는다.
-  static const _addButtonX = 0.0;
 
   int _index = 0;
   // 값이 바뀌면 화면이 새로 만들어지면서 저장소를 다시 읽는다.
@@ -69,75 +65,39 @@ class _RootScreenState extends State<RootScreen> {
 
   Widget _buildBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: SizedBox(
-        // ⊕ 버튼이 바 위로 솟기 때문에 그만큼 높이를 더 잡는다.
-        height: _barHeight + 22,
-        child: Stack(
-          clipBehavior: Clip.none,
+        height: _barHeight,
+        child: Row(
           children: [
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(26),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                  child: Container(
-                    height: _barHeight,
-                    decoration: BoxDecoration(
-                      color: kNavBarBackground.resolveFrom(context),
-                      borderRadius: BorderRadius.circular(100),
-                      border: Border.all(
-                        color: CupertinoColors.separator.resolveFrom(context),
-                        width: 0.5,
-                      ),
-                    ),
-                    // 양쪽을 같은 너비로 나눠야 가운데 빈칸이 정확히 바 중앙에
-                    // 오고, ⊕ 버튼도 거기에 맞아떨어진다.
-                    child: Row(
+            // 탭 세 개를 담은 캡슐.
+            Expanded(
+              child: GlassSurface(
+                child: Stack(
+                  children: [
+                    LiquidIndicator(index: _index, tabCount: 3),
+                    Row(
                       children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              _buildTab(
-                                context,
-                                0,
-                                CupertinoIcons.house_fill,
-                                '홈',
-                              ),
-                              _buildTab(
-                                context,
-                                1,
-                                CupertinoIcons.calendar,
-                                '달력',
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 64), // ⊕ 자리
-                        Expanded(
-                          child: Row(
-                            children: [
-                              _buildTab(
-                                context,
-                                2,
-                                CupertinoIcons.gear_alt_fill,
-                                '설정',
-                              ),
-                            ],
-                          ),
+                        _buildTab(context, 0, CupertinoIcons.house_fill, '홈'),
+                        _buildTab(context, 1, CupertinoIcons.calendar, '달력'),
+                        _buildTab(
+                          context,
+                          2,
+                          CupertinoIcons.gear_alt_fill,
+                          '설정',
                         ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
-            Align(
-              alignment: const Alignment(_addButtonX, -1),
-              child: _buildAddButton(context),
+            const SizedBox(width: 10),
+            // 캡슐에서 떨어져 나온 원형 기록 버튼.
+            SizedBox(
+              width: _barHeight,
+              height: _barHeight,
+              child: GlassSurface(child: _buildAddButton(context)),
             ),
           ],
         ),
@@ -178,32 +138,16 @@ class _RootScreenState extends State<RootScreen> {
     );
   }
 
+  /// 유리 위에 아이콘만 올린다 — 배경은 GlassSurface가 그린다.
   Widget _buildAddButton(BuildContext context) {
-    final primary = CupertinoTheme.of(context).primaryColor;
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: _addMood,
-      child: Container(
-        width: _addButtonSize,
-        height: _addButtonSize,
-        decoration: BoxDecoration(
-          color: primary,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: CupertinoColors.systemBackground.resolveFrom(context),
-            width: 3,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: primary.withValues(alpha: 0.35),
-              blurRadius: 14,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: const Icon(
+      child: Center(
+        child: Icon(
           CupertinoIcons.add,
-          color: CupertinoColors.white,
           size: 26,
+          color: CupertinoTheme.of(context).primaryColor,
         ),
       ),
     );

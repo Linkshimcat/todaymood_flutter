@@ -13,3 +13,12 @@ const kNavBarBackground = CupertinoDynamicColor.withBrightness(
 /// 떠 있는 바텀 네비게이션이 가리는 높이. 각 화면은 스크롤 끝에 이만큼을
 /// 비워둬야 마지막 카드가 바 뒤에 숨지 않는다.
 const kBottomNavSpace = 108.0;
+
+/// 선택된 탭 뒤에 깔리는 표시.
+///
+/// 유리보다 어둡게 하면 얼룩처럼 보인다. 반대로 더 밝고 불투명하게 만들어
+/// 유리 위에 한 겹 얹힌 것처럼 보이게 한다.
+const kTabIndicator = CupertinoDynamicColor.withBrightness(
+  color: Color(0xF2FFFFFF),
+  darkColor: Color(0x40FFFFFF),
+);

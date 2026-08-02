@@ -18,5 +18,8 @@ import UIKit
     WidgetBridge.register(
       with: engineBridge.pluginRegistry.registrar(forPlugin: "WidgetBridge")!
     )
+    GlassPlatformView.register(
+      with: engineBridge.pluginRegistry.registrar(forPlugin: "GlassPlatformView")!
+    )
   }
 }

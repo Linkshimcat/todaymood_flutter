@@ -17,6 +17,7 @@
 		3E5B6DBF91FA9764D127A1EC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8F59E9321D7CD789A9A0DCE7 /* Foundation.framework */; };
 		40FF478D78F8723FC13BA3F4 /* MoodWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD331A3836CC22D46658F798 /* MoodWidgetBundle.swift */; };
 		4804B65096AE97C1C09A10BB /* MoodWidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE19DF1C8FF7624E6D3FAF88 /* MoodWidgetData.swift */; };
+		5775EF65D10F2FAC7DA3050F /* GlassPlatformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF03260AA41CD05FA8204DE /* GlassPlatformView.swift */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
@@ -82,6 +83,7 @@
 		377C798958A92B9C85D7748B /* Runner.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		38DF6415FA03FB61648E81C9 /* MoodWidgetLiveActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MoodWidgetLiveActivity.swift; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		4BF03260AA41CD05FA8204DE /* GlassPlatformView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GlassPlatformView.swift; sourceTree = "<group>"; };
 		4E3801093147141FA4331841 /* MoodWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MoodWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		64A278EBD81FBD3432DFE9BF /* LiveActivityBridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LiveActivityBridge.swift; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 				64A278EBD81FBD3432DFE9BF /* LiveActivityBridge.swift */,
 				0F48CC773777A6FDC934DF35 /* WidgetBridge.swift */,
 				377C798958A92B9C85D7748B /* Runner.entitlements */,
+				4BF03260AA41CD05FA8204DE /* GlassPlatformView.swift */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -402,6 +405,7 @@
 				DB713CDAD12F8013929930F3 /* MoodActivityAttributes.swift in Sources */,
 				3364EF746E4DB68C57E1C880 /* LiveActivityBridge.swift in Sources */,
 				04B90A8BC3C9F40B2A104CFA /* WidgetBridge.swift in Sources */,
+				5775EF65D10F2FAC7DA3050F /* GlassPlatformView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
