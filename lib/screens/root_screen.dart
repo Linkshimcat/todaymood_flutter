@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 
 import '../services/mood_editor.dart';
 import '../widgets/glass_surface.dart';
-import '../widgets/liquid_indicator.dart';
 import 'calendar_screen.dart';
 import 'home_screen.dart';
 import 'reminder_screen.dart';
@@ -50,15 +49,19 @@ class _RootScreenState extends State<RootScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 바텀 시트 같은 모달이 떠 있으면 유리 바가 위로 새어 보인다.
+    // (iOS 플랫폼 뷰는 Flutter의 반투명 배리어에 가려지지 않는다)
+    final coveredByModal = !(ModalRoute.of(context)?.isCurrent ?? true);
     return Stack(
       children: [
         Positioned.fill(child: _currentScreen),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: MediaQuery.paddingOf(context).bottom + 8,
-          child: _buildBar(context),
-        ),
+        if (!coveredByModal)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: MediaQuery.paddingOf(context).bottom + 8,
+            child: _buildBar(context),
+          ),
       ],
     );
   }
@@ -73,20 +76,15 @@ class _RootScreenState extends State<RootScreen> {
             // 탭 세 개를 담은 캡슐.
             Expanded(
               child: GlassSurface(
-                child: Stack(
+                child: Row(
                   children: [
-                    LiquidIndicator(index: _index, tabCount: 3),
-                    Row(
-                      children: [
-                        _buildTab(context, 0, CupertinoIcons.house_fill, '홈'),
-                        _buildTab(context, 1, CupertinoIcons.calendar, '달력'),
-                        _buildTab(
-                          context,
-                          2,
-                          CupertinoIcons.gear_alt_fill,
-                          '설정',
-                        ),
-                      ],
+                    _buildTab(context, 0, CupertinoIcons.house_fill, '홈'),
+                    _buildTab(context, 1, CupertinoIcons.calendar, '달력'),
+                    _buildTab(
+                      context,
+                      2,
+                      CupertinoIcons.gear_alt_fill,
+                      '설정',
                     ),
                   ],
                 ),

@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:today_mood/main.dart';
-import 'package:today_mood/widgets/liquid_indicator.dart';
 import 'package:today_mood/widgets/mood_card.dart';
 import 'package:today_mood/widgets/mood_picker_sheet.dart';
 
@@ -213,27 +212,6 @@ void main() {
     expect(find.text('알림 받기'), findsOneWidget);
     // 알림이 꺼진 상태에서는 요일/시간 섹션이 보이지 않아야 한다.
     expect(find.text('요일'), findsNothing);
-  });
-
-  testWidgets('selection indicator slides to the tapped tab', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(const MyApp());
-    await tester.pumpAndSettle();
-
-    double indicatorAlignment() =>
-        tester.state<LiquidIndicatorState>(find.byType(LiquidIndicator)).alignment;
-
-    // 탭이 세 칸이므로 표시(폭 1/3)의 alignment는 첫 칸 -1, 가운데 0, 마지막 1.
-    expect(indicatorAlignment(), closeTo(-1, 0.001));
-
-    await tester.tap(find.byIcon(CupertinoIcons.calendar));
-    await tester.pumpAndSettle();
-    expect(indicatorAlignment(), closeTo(0, 0.001));
-
-    await tester.tap(find.byIcon(CupertinoIcons.gear_alt_fill));
-    await tester.pumpAndSettle();
-    expect(indicatorAlignment(), closeTo(1, 0.001));
   });
 
   testWidgets('bottom nav switches tabs and the center button records', (
