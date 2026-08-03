@@ -7,7 +7,6 @@ import '../models/mood_entry.dart';
 import '../services/live_activity_service.dart';
 import '../services/mood_editor.dart';
 import '../services/mood_storage.dart';
-import '../services/mood_sync_service.dart';
 import '../services/photo_storage.dart';
 import '../services/widget_service.dart';
 import '../theme.dart';
@@ -61,7 +60,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final entries = await _storage.load();
     entries.removeWhere((e) => e.id == entry.id);
     await _storage.save(entries);
-    await MoodSyncService.instance.push(entries);
     if (entry.imageFileName != null) {
       await PhotoStorage.delete(entry.imageFileName!);
     }

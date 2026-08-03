@@ -24,19 +24,6 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<!-- Google 로그인: GoogleService-Info.plist의 REVERSED_CLIENT_ID 값으로
-	     아래 com.googleusercontent.apps. 로 시작하는 문자열을 바꿔야 한다. -->
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.googleusercontent.apps.1022845229279-bd31go6vlnlskei2c237ajcm1okr4d5v</string>
-			</array>
-		</dict>
-	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSSupportsLiveActivities</key>

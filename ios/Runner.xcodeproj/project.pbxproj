@@ -102,7 +102,6 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C1C074870F708FE618FAB0B1 /* MoodWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = MoodWidget.entitlements; sourceTree = "<group>"; };
 		CD331A3836CC22D46658F798 /* MoodWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MoodWidgetBundle.swift; sourceTree = "<group>"; };
-		DFAB23453020C10C00DFDB4E /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		EE19DF1C8FF7624E6D3FAF88 /* MoodWidgetData.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MoodWidgetData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -163,7 +162,6 @@
 				331C8082294A63A400263BE5 /* RunnerTests */,
 				BE9B1A96DA99AEBBA7406BDB /* Frameworks */,
 				F8A2C7D86A95084ABEE1D996 /* MoodWidget */,
-				DFAB23453020C10C00DFDB4E /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -338,7 +336,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
-				DFAB23463020C10C00DFDB4E /* GoogleService-Info.plist in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,

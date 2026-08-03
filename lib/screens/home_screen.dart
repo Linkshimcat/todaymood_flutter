@@ -5,7 +5,6 @@ import '../models/mood_entry.dart';
 import '../services/live_activity_service.dart';
 import '../services/mood_editor.dart';
 import '../services/mood_storage.dart';
-import '../services/mood_sync_service.dart';
 import '../services/photo_storage.dart';
 import '../services/widget_service.dart';
 import '../theme.dart';
@@ -49,7 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
     HapticFeedback.mediumImpact();
     setState(() => _entries.removeWhere((e) => e.id == entry.id));
     await _storage.save(_entries);
-    await MoodSyncService.instance.push(_entries);
     if (entry.imageFileName != null) {
       await PhotoStorage.delete(entry.imageFileName!);
     }

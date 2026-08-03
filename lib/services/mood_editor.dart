@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import '../models/mood_entry.dart';
 import '../widgets/mood_picker_sheet.dart';
 import 'live_activity_service.dart';
-import 'mood_sync_service.dart';
 import 'mood_storage.dart';
 import 'widget_service.dart';
 import 'photo_storage.dart';
@@ -33,7 +32,6 @@ Future<bool> createMoodEntry(BuildContext context) async {
     ),
   );
   await storage.save(entries);
-  await MoodSyncService.instance.push(entries);
   await LiveActivityService.refresh();
   await WidgetService.refresh();
   return true;
@@ -81,7 +79,6 @@ Future<bool> editMoodEntry(BuildContext context, MoodEntry entry) async {
     imageFileName: newFileName,
   );
   await storage.save(entries);
-  await MoodSyncService.instance.push(entries);
   await LiveActivityService.refresh();
   await WidgetService.refresh();
   return true;
