@@ -42,6 +42,77 @@ private final class GlassView: NSObject, FlutterPlatformView {
   func view() -> UIView { container }
 }
 
+/// iOS 26의 Liquid Glass 스타일 UISwitch를 올려주는 플랫폼 뷰.
+///
+/// UISwitch는 iOS 26 SDK로 컴파일하면 시스템이 자동으로 새 유리 모양과
+/// 상호작용(스위치 손잡이의 형태 변화)을 입혀 준다. 구형 OS에서는 기존
+/// 시스템 스위치로 그려진다.
+enum GlassSwitchPlatformView {
+  static let viewType = "today_mood/glass_switch"
+
+  static func register(with registrar: FlutterPluginRegistrar) {
+    registrar.register(
+      GlassSwitchViewFactory(messenger: registrar.messenger()),
+      withId: viewType
+    )
+  }
+}
+
+private final class GlassSwitchViewFactory: NSObject, FlutterPlatformViewFactory {
+  private let messenger: FlutterBinaryMessenger
+
+  init(messenger: FlutterBinaryMessenger) {
+    self.messenger = messenger
+  }
+
+  func create(
+    withFrame frame: CGRect,
+    viewIdentifier viewId: Int64,
+    arguments args: Any?
+  ) -> FlutterPlatformView {
+    GlassSwitchView(frame: frame, messenger: messenger, args: args)
+  }
+
+  func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
+    FlutterStandardMessageCodec.sharedInstance()
+  }
+}
+
+private final class GlassSwitchView: NSObject, FlutterPlatformView {
+  private let control: UISwitch
+  private let channel: FlutterMethodChannel
+
+  init(frame: CGRect, messenger: FlutterBinaryMessenger, args: Any?) {
+    let params = args as? [String: Any] ?? [:]
+    control = UISwitch()
+    control.isOn = params["value"] as? Bool ?? false
+    channel = FlutterMethodChannel(
+      name: params["channelName"] as? String ?? "today_mood/glass_switch",
+      binaryMessenger: messenger
+    )
+    super.init()
+
+    // 사용자가 토글하면 Dart 상태를 바꾸고, 반영된 값은 setValue로 내려온다.
+    control.addTarget(self, action: #selector(controlChanged), for: .valueChanged)
+    channel.setMethodCallHandler { [weak self] call, result in
+      switch call.method {
+      case "setValue":
+        let value = (call.arguments as? [String: Any])?["value"] as? Bool ?? false
+        self?.control.setOn(value, animated: true)
+        result(nil)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+  }
+
+  @objc private func controlChanged() {
+    channel.invokeMethod("onChanged", arguments: ["value": control.isOn])
+  }
+
+  func view() -> UIView { control }
+}
+
 private final class GlassContainer: UIView {
   private let effectView: UIVisualEffectView
   private let isCapsule: Bool

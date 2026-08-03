@@ -21,5 +21,8 @@ import UIKit
     GlassPlatformView.register(
       with: engineBridge.pluginRegistry.registrar(forPlugin: "GlassPlatformView")!
     )
+    GlassSwitchPlatformView.register(
+      with: engineBridge.pluginRegistry.registrar(forPlugin: "GlassSwitchPlatformView")!
+    )
   }
 }

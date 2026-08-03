@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'screens/root_screen.dart';
+import 'services/auth_service.dart';
 import 'services/notification_service.dart';
 import 'services/photo_storage.dart';
 import 'services/widget_service.dart';
@@ -9,6 +11,12 @@ import 'services/widget_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ko_KR');
+  // Firebase 설정 파일(GoogleService-Info.plist / google-services.json)이
+  // 아직 없어도 앱은 켜질 수 있어야 한다.
+  try {
+    await Firebase.initializeApp();
+    AuthService.instance.listen();
+  } catch (_) {}
   await PhotoStorage.init();
   await NotificationService.instance.init();
   // 앱을 껐다 켜는 사이 기록이 바뀌었을 수 있으니 위젯을 한 번 맞춰둔다.

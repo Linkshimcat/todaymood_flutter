@@ -1,4 +1,4 @@
-package com.example.today_mood
+package com.linkcat.todaymood
 
 import io.flutter.embedding.android.FlutterActivity
 

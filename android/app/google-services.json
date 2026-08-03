@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1022845229279",
+    "project_id": "todaymood-78119",
+    "storage_bucket": "todaymood-78119.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1022845229279:android:04928bdc000de15a51f16a",
+        "android_client_info": {
+          "package_name": "com.linkcat.todaymood"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1022845229279-edgmk43raspd3o7bf27ucdnccvaa6fc8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2PjuJ4uY1TNujmIsfl8IUZgbjJrvQyE0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1022845229279-edgmk43raspd3o7bf27ucdnccvaa6fc8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1022845229279-bd31go6vlnlskei2c237ajcm1okr4d5v.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.linkcat.todayMood"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
