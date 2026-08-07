@@ -59,15 +59,15 @@ class NotificationService {
     await _plugin.cancelAll();
     if (!settings.enabled) return;
 
-    const details = NotificationDetails(
-      android: AndroidNotificationDetails(
-        'mood_reminder',
-        '기분 기록 알림',
-        channelDescription: '설정한 시간에 기분 기록을 알려줍니다',
-      ),
-      iOS: DarwinNotificationDetails(),
-    );
+    if (settings.mode == ReminderMode.once) {
+      await _scheduleOnce(settings);
+    } else {
+      await _scheduleRepeating(settings);
+    }
+  }
 
+  Future<void> _scheduleOnce(ReminderSettings settings) async {
+    const details = _details;
     for (final weekday in settings.weekdays) {
       await _plugin.zonedSchedule(
         id: weekday,
@@ -80,6 +80,45 @@ class NotificationService {
       );
     }
   }
+
+  /// 시작~종료 구간을 주기 간격으로 나눠 알림을 예약한다.
+  /// 각 알림은 같은 요일·시간에 매주 반복된다.
+  Future<void> _scheduleRepeating(ReminderSettings settings) async {
+    if (!settings.endAfterStart) return;
+
+    var id = 1000;
+    final endMinuteOfDay = settings.endHour * 60 + settings.endMinute;
+    for (final weekday in settings.weekdays) {
+      var scheduled = _nextInstanceOf(
+        weekday,
+        settings.startHour,
+        settings.startMinute,
+      );
+      while (scheduled.hour * 60 + scheduled.minute < endMinuteOfDay) {
+        await _plugin.zonedSchedule(
+          id: id++,
+          title: '오늘도 기록해볼까요? 🙂',
+          body: '오늘의 기분을 카드로 기록해보세요',
+          scheduledDate: scheduled,
+          notificationDetails: _details,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+        );
+        scheduled = scheduled.add(
+          Duration(minutes: settings.intervalMinutes),
+        );
+      }
+    }
+  }
+
+  static const _details = NotificationDetails(
+    android: AndroidNotificationDetails(
+      'mood_reminder',
+      '기분 기록 알림',
+      channelDescription: '설정한 시간에 기분 기록을 알려줍니다',
+    ),
+    iOS: DarwinNotificationDetails(),
+  );
 
   tz.TZDateTime _nextInstanceOf(int weekday, int hour, int minute) {
     final now = tz.TZDateTime.now(tz.local);

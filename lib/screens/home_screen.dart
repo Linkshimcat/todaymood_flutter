@@ -36,6 +36,101 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _refresh() async {
+    await Future.wait([
+      _load(),
+      Future<void>.delayed(const Duration(milliseconds: 1200)),
+    ]);
+  }
+
+  static const _indicatorRadius = 15.0;
+
+  Widget _buildRefreshIndicator(
+    BuildContext context,
+    RefreshIndicatorMode refreshState,
+    double pulledExtent,
+    double refreshTriggerPullDistance,
+    double refreshIndicatorExtent,
+  ) {
+    final topInset = MediaQuery.paddingOf(context).top;
+    final percentageComplete = (pulledExtent / refreshTriggerPullDistance)
+        .clamp(0.0, 1.0)
+        .toDouble();
+    final primary = CupertinoTheme.of(context).primaryColor;
+    final blue = CupertinoColors.systemBlue.resolveFrom(context);
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            primary.withValues(alpha: 0.16),
+            blue.withValues(alpha: 0.09),
+            primary.withValues(alpha: 0.0),
+          ],
+          stops: const [0.0, 0.55, 1.0],
+        ),
+      ),
+      child: Center(
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned(
+              top: topInset + 18,
+              left: 0,
+              right: 0,
+              child: _indicatorForState(refreshState, percentageComplete),
+            ),
+            if (refreshState == RefreshIndicatorMode.refresh)
+              Positioned(
+                top: topInset + 56,
+                left: 0,
+                right: 0,
+                child: const Text(
+                  '오늘의 기분 리프레시 중..',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: CupertinoColors.secondaryLabel,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _indicatorForState(
+    RefreshIndicatorMode refreshState,
+    double percentageComplete,
+  ) {
+    switch (refreshState) {
+      case RefreshIndicatorMode.drag:
+        return Opacity(
+          opacity: const Interval(
+            0.0,
+            0.35,
+            curve: Curves.easeInOut,
+          ).transform(percentageComplete),
+          child: CupertinoActivityIndicator.partiallyRevealed(
+            radius: _indicatorRadius,
+            progress: percentageComplete,
+          ),
+        );
+      case RefreshIndicatorMode.armed:
+      case RefreshIndicatorMode.refresh:
+        return CupertinoActivityIndicator(radius: _indicatorRadius);
+      case RefreshIndicatorMode.done:
+        return CupertinoActivityIndicator(
+          radius: _indicatorRadius * percentageComplete,
+        );
+      case RefreshIndicatorMode.inactive:
+        return const SizedBox.shrink();
+    }
+  }
+
   Future<void> _addMood() async {
     if (await createMoodEntry(context)) await _load();
   }
@@ -57,10 +152,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final topInset = MediaQuery.paddingOf(context).top;
     return CupertinoPageScaffold(
-      backgroundColor: CupertinoColors.systemGroupedBackground,
+      backgroundColor: kAppBackground,
       child: CustomScrollView(
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
         slivers: [
+          CupertinoSliverRefreshControl(
+            onRefresh: _refresh,
+            refreshIndicatorExtent: 120 + topInset,
+            refreshTriggerPullDistance: 140 + topInset,
+            builder: _buildRefreshIndicator,
+          ),
           const CupertinoSliverNavigationBar(
             backgroundColor: kNavBarBackground,
             largeTitle: Text('오늘의 기분은?'),

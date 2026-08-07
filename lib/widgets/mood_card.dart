@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../models/mood.dart';
 import '../models/mood_entry.dart';
 import '../services/photo_storage.dart';
+import 'photo_viewer.dart';
 
 class MoodCard extends StatelessWidget {
   final MoodEntry entry;
@@ -89,7 +90,9 @@ class MoodCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          DateFormat('M월 d일 (E)', 'ko_KR').format(entry.date),
+                          DateFormat('M월 d일 (E) HH:mm', 'ko_KR').format(
+                            entry.date,
+                          ),
                           style: TextStyle(
                             fontSize: 14,
                             color: CupertinoColors.secondaryLabel.resolveFrom(
@@ -114,23 +117,29 @@ class MoodCard extends StatelessWidget {
               ),
               if (entry.imageFileName != null) ...[
                 const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.file(
-                    File(PhotoStorage.pathFor(entry.imageFileName!)),
-                    width: double.infinity,
-                    height: 160,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
+                GestureDetector(
+                  onTap: () => PhotoViewer.show(
+                    context,
+                    PhotoStorage.pathFor(entry.imageFileName!),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.file(
+                      File(PhotoStorage.pathFor(entry.imageFileName!)),
+                      width: double.infinity,
                       height: 160,
-                      alignment: Alignment.center,
-                      color: CupertinoColors.tertiarySystemFill.resolveFrom(
-                        context,
-                      ),
-                      child: Icon(
-                        CupertinoIcons.photo,
-                        color: CupertinoColors.secondaryLabel.resolveFrom(
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        height: 160,
+                        alignment: Alignment.center,
+                        color: CupertinoColors.tertiarySystemFill.resolveFrom(
                           context,
+                        ),
+                        child: Icon(
+                          CupertinoIcons.photo,
+                          color: CupertinoColors.secondaryLabel.resolveFrom(
+                            context,
+                          ),
                         ),
                       ),
                     ),

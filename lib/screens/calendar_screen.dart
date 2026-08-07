@@ -77,7 +77,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     final selectedEntries = _byDay[_selected] ?? const <MoodEntry>[];
     return CupertinoPageScaffold(
-      backgroundColor: CupertinoColors.systemGroupedBackground,
+      backgroundColor: kAppBackground,
       navigationBar: const CupertinoNavigationBar(
         backgroundColor: kNavBarBackground,
         middle: Text('달력'),

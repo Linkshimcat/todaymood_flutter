@@ -14,6 +14,22 @@ const kNavBarBackground = CupertinoDynamicColor.withBrightness(
 /// 비워둬야 마지막 카드가 바 뒤에 숨지 않는다.
 const kBottomNavSpace = 108.0;
 
+/// 화면 배경.
+///
+/// 라이트는 iOS 기본 그룹 배경을, 다크는 앱만의 짙은 청회색(0C0F14)을 쓴다.
+const kAppBackground = CupertinoDynamicColor.withBrightness(
+  color: Color(0xFFF2F2F7),
+  darkColor: Color(0xFF0C0F14),
+);
+
+/// 그룹 목록(설정 화면) 섹션 카드 배경.
+///
+/// 다크 모드에서는 배경(0C0F14)보다 살짝 밝아 카드가 드러나도록 한다.
+const kListSectionBackground = CupertinoDynamicColor.withBrightness(
+  color: Color(0xFFFFFFFF),
+  darkColor: Color(0xFF151A21),
+);
+
 /// 선택된 탭 뒤에 깔리는 표시.
 ///
 /// 유리보다 어둡게 하면 얼룩처럼 보인다. 반대로 더 밝고 불투명하게 만들어
