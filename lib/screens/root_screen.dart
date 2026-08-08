@@ -97,7 +97,7 @@ class _RootScreenState extends State<RootScreen> {
     return Positioned(
       left: 0,
       right: 0,
-      bottom: bottomInset -20,
+      bottom: bottomInset -30,
       height: _barHeight,
       child: NativeTabBar(
         selectedIndex: _index,

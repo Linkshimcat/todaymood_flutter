@@ -19,6 +19,9 @@ Future<bool> createMoodEntry(BuildContext context) async {
 
   final storage = MoodStorage();
   final entries = await storage.load();
+  final imageFileName = result.imagePath == null
+      ? null
+      : await PhotoStorage.save(result.imagePath!);
   entries.insert(
     0,
     MoodEntry(
@@ -26,12 +29,11 @@ Future<bool> createMoodEntry(BuildContext context) async {
       date: DateTime.now(),
       emojis: result.moods.map((m) => m.emoji).toList(),
       note: result.note,
-      imageFileName: result.imagePath == null
-          ? null
-          : await PhotoStorage.save(result.imagePath!),
+      imageFileName: imageFileName,
     ),
   );
   await storage.save(entries);
+  if (imageFileName != null) await PhotoStorage.upload(imageFileName);
   await LiveActivityService.refresh();
   await WidgetService.refresh();
   return true;
@@ -79,6 +81,7 @@ Future<bool> editMoodEntry(BuildContext context, MoodEntry entry) async {
     imageFileName: newFileName,
   );
   await storage.save(entries);
+  if (newFileName != null) await PhotoStorage.upload(newFileName);
   await LiveActivityService.refresh();
   await WidgetService.refresh();
   return true;

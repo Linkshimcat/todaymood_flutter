@@ -31,16 +31,32 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   void initState() {
     super.initState();
+    MoodStorage.cache.addListener(_onCacheChanged);
     final today = _dateOnly(DateTime.now());
     _month = DateTime(today.year, today.month);
     _selected = today;
     _load();
   }
 
+  @override
+  void dispose() {
+    MoodStorage.cache.removeListener(_onCacheChanged);
+    super.dispose();
+  }
+
+  void _onCacheChanged() {
+    if (!mounted) return;
+    _apply(MoodStorage.cache.value);
+  }
+
   static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
   Future<void> _load() async {
     final entries = await _storage.load();
+    _apply(entries);
+  }
+
+  void _apply(List<MoodEntry> entries) {
     final grouped = <DateTime, List<MoodEntry>>{};
     for (final entry in entries) {
       grouped.putIfAbsent(_dateOnly(entry.date), () => []).add(entry);

@@ -25,11 +25,31 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    MoodStorage.cache.addListener(_onCacheChanged);
+    MoodStorage.syncing.addListener(_onSyncingChanged);
     _load();
+  }
+
+  @override
+  void dispose() {
+    MoodStorage.cache.removeListener(_onCacheChanged);
+    MoodStorage.syncing.removeListener(_onSyncingChanged);
+    super.dispose();
+  }
+
+  void _onCacheChanged() {
+    if (!mounted) return;
+    setState(() => _entries = MoodStorage.cache.value);
+  }
+
+  void _onSyncingChanged() {
+    if (!mounted) return;
+    setState(() {});
   }
 
   Future<void> _load() async {
     final entries = await _storage.load();
+    if (!mounted) return;
     setState(() {
       _entries = entries;
       _loading = false;
@@ -38,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _refresh() async {
     await Future.wait([
-      _load(),
+      _storage.refresh(),
       Future<void>.delayed(const Duration(milliseconds: 1200)),
     ]);
   }
@@ -170,6 +190,13 @@ class _HomeScreenState extends State<HomeScreen> {
             backgroundColor: kNavBarBackground,
             largeTitle: Text('오늘의 기분은?'),
           ),
+          if (MoodStorage.syncing.value)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.only(top: 4),
+                child: _SyncBadge(),
+              ),
+            ),
           if (_loading)
             const SliverFillRemaining(
               hasScrollBody: false,
@@ -228,6 +255,38 @@ class _EmptyState extends StatelessWidget {
             child: const Text('기분 기록하기'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 클라우드 동기화가 도는 동안 상단에 표시되는 작은 배지.
+class _SyncBadge extends StatelessWidget {
+  const _SyncBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+        decoration: BoxDecoration(
+          color: CupertinoColors.secondarySystemBackground.resolveFrom(context),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CupertinoActivityIndicator(radius: 8),
+            const SizedBox(width: 8),
+            Text(
+              '동기화 중..',
+              style: TextStyle(
+                fontSize: 12,
+                color: CupertinoColors.secondaryLabel.resolveFrom(context),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

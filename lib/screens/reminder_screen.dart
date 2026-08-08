@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/reminder_settings.dart';
 import '../services/live_activity_service.dart';
 import '../services/notification_service.dart';
+import '../services/supabase_config.dart';
 import '../theme.dart';
 import '../widgets/glass_switch.dart';
 
@@ -438,9 +440,36 @@ class _ReminderScreenState extends State<ReminderScreen> {
                         ],
                       ),
                   ],
+                  _AccountSection(),
                 ],
               ),
             ),
+    );
+  }
+}
+
+class _AccountSection extends StatelessWidget {
+  const _AccountSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final initialized = SupabaseConfig.isInitialized;
+    final email = initialized
+        ? Supabase.instance.client.auth.currentUser?.email
+        : null;
+    return CupertinoListSection.insetGrouped(
+      backgroundColor: kListSectionBackground,
+      header: const Text('계정'),
+      footer: email == null ? null : Text(email),
+      children: [
+        CupertinoListTile(
+          title: const Text('로그아웃'),
+          trailing: const Icon(CupertinoIcons.square_arrow_right),
+          onTap: initialized
+              ? () => Supabase.instance.client.auth.signOut()
+              : null,
+        ),
+      ],
     );
   }
 }
