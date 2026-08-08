@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
 import '../services/mood_editor.dart';
+import '../services/platform_info.dart';
 import '../widgets/glass_surface.dart';
+import '../widgets/native_tab_bar.dart';
 import 'calendar_screen.dart';
 import 'home_screen.dart';
 import 'reminder_screen.dart';
@@ -15,11 +17,27 @@ class RootScreen extends StatefulWidget {
 }
 
 class _RootScreenState extends State<RootScreen> {
-  static const _barHeight = 58.0;
+  // 네이티브 UITabBar의 자연 높이(intrinsicContentSize = 83pt). [+]도 캡슐
+  // 안의 4번째 아이템이므로 별도 정렬은 필요 없다.
+  static const _barHeight = 83.0;
 
   int _index = 0;
   // 값이 바뀌면 화면이 새로 만들어지면서 저장소를 다시 읽는다.
   int _refreshToken = 0;
+  // null이면 아직 판별 전. iOS가 아니면 항상 Flutter 바를 쓴다.
+  bool? _useNativeBar;
+
+  @override
+  void initState() {
+    super.initState();
+    _initNativeBar();
+  }
+
+  Future<void> _initNativeBar() async {
+    final native = await PlatformInfo.supportsNativeLiquidGlass;
+    if (!mounted) return;
+    setState(() => _useNativeBar = native);
+  }
 
   Widget get _currentScreen {
     switch (_index) {
@@ -52,17 +70,40 @@ class _RootScreenState extends State<RootScreen> {
     // 바텀 시트 같은 모달이 떠 있으면 유리 바가 위로 새어 보인다.
     // (iOS 플랫폼 뷰는 Flutter의 반투명 배리어에 가려지지 않는다)
     final coveredByModal = !(ModalRoute.of(context)?.isCurrent ?? true);
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+    final keyboardUp = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final useNativeBar = _useNativeBar ?? false;
+
     return Stack(
       children: [
         Positioned.fill(child: _currentScreen),
-        if (!coveredByModal)
+        if (!coveredByModal && useNativeBar)
+          if (!keyboardUp)
+            _buildNativeBar(bottomInset)
+          else
+            const SizedBox.shrink(),
+        if (!coveredByModal && !useNativeBar)
           Positioned(
             left: 0,
             right: 0,
-            bottom: MediaQuery.paddingOf(context).bottom + 8,
+            bottom: bottomInset,
             child: _buildBar(context),
           ),
       ],
+    );
+  }
+
+  Widget _buildNativeBar(double bottomInset) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: bottomInset -20,
+      height: _barHeight,
+      child: NativeTabBar(
+        selectedIndex: _index,
+        onSelect: _selectTab,
+        onAdd: _addMood,
+      ),
     );
   }
 

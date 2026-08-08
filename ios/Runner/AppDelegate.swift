@@ -24,5 +24,8 @@ import UIKit
     GlassSwitchPlatformView.register(
       with: engineBridge.pluginRegistry.registrar(forPlugin: "GlassSwitchPlatformView")!
     )
+    NativeTabBarBridge.register(
+      with: engineBridge.pluginRegistry.registrar(forPlugin: "NativeTabBarBridge")!
+    )
   }
 }

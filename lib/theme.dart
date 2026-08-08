@@ -12,7 +12,8 @@ const kNavBarBackground = CupertinoDynamicColor.withBrightness(
 
 /// 떠 있는 바텀 네비게이션이 가리는 높이. 각 화면은 스크롤 끝에 이만큼을
 /// 비워둬야 마지막 카드가 바 뒤에 숨지 않는다.
-const kBottomNavSpace = 108.0;
+/// (iOS 26 네이티브 바 83 + 하단 인셋 34 + 오프셋 8 + 여유)
+const kBottomNavSpace = 132.0;
 
 /// 화면 배경.
 ///
